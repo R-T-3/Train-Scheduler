@@ -21,7 +21,7 @@ $("#add-train-btn").on("click", function(event) {
 // Grabs user input
     var trainName = $("#train-name-input").val().trim();
     var destination = $("#destination-input").val().trim();
-    var firstTrainTime = $("#train-time-input").val();
+    var firstTrainTime = moment($("#train-time-input").val(), "HH").format("X");
     var frequency = $("#frequency-input").val();
 
 // Creates local "temporary" object for holding train data
@@ -49,26 +49,28 @@ database.ref().on("child_added", function(childSnapshot) {
 // Store everything into a variable.
     var trainName = childSnapshot.val().trainName;
     var destination = childSnapshot.val().destination;
-    var firstTimeTrain = childSnapshot.val().firstTimeTrain;
+    var firstTimeTrain = childSnapshot.val().firstTrainTime;
     var frequency = childSnapshot.val().frequency;
 
 // First Time 
     var firstTimeConverted = moment(firstTimeTrain, "HH:mm").subtract(1, "years");
     console.log(firstTimeConverted);
+    console.log(firstTimeTrain);
 
 
 // Difference between the times
-    var diffTime = moment().diff(moment(firstTimeConverted), "minutes");
-    
+    var diffTime = moment().diff(moment.unix(firstTimeTrain), "minutes");
+    console.log(diffTime);
 
 // Time apart (remainder)
     var tRemainder = diffTime % frequency;
-
+    console.log(tRemainder);
 // Minute Until Train
     var tMinutesTillTrain = frequency - tRemainder;
-
+    console.log(frequency);
+    
 // Next Train
-    var nextArrival = moment().add(tMinutesTillTrain, "minutes");
+    var nextArrival = moment().add(tMinutesTillTrain, "minutes").format("hh:mm a");
 
   // Create the new row
     var newRow = $("<tr>").append(
